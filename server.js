@@ -6,7 +6,23 @@ const cors = require("cors");
 const morgan = require("morgan");
 
 const apiRoutes = require("./routes/index.route");
-app.use(cors());
+
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? [process.env.FRONTEND_ORIGIN]
+    : [`http://localhost:${port}`];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
 
 app.use(morgan("tiny"));
 
